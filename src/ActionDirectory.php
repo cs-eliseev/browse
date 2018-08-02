@@ -2,6 +2,8 @@
 
 namespace browse;
 
+use DirectoryIterator;
+
 /**
  * Class ActionDirectory
  *
