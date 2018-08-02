@@ -1,0 +1,21 @@
+{
+    "name": "cs-eliseev/browse",
+    "description": "Directory managing",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Eliseev Alexey",
+            "email": "a.k.eliseev@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "cs-eliseev\\": "src"
+        }
+    }
+}
