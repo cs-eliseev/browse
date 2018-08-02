@@ -1,3 +1,3 @@
 # Browse PHP
 
-This library contains pure PHP implementations for directory manging.
+This library contains pure PHP implementations for directory managing.
