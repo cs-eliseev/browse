@@ -539,7 +539,7 @@ class ActionDirectory
     }
 
     /**
-     * Get current path directory
+     * Get current name directory
      *
      * @param string $pathDir
      * @return mixed
@@ -592,6 +592,38 @@ class ActionDirectory
         array_pop($list_path);
 
         return implode(DIRECTORY_SEPARATOR, $list_path);
+    }
+
+    /**
+     * Go to parent directory
+     *
+     * @return string
+     */
+    public function gotoParentDir()
+    {
+        $this->pathDir = $this->getParentDir();
+
+        return $this->pathDir;
+    }
+
+    /**
+     * Go to sub directory
+     *
+     * @param $subDir
+     * @return string
+     */
+    public function gotoSubDir($subDir)
+    {
+        $new_dir = $this->pathDir . DIRECTORY_SEPARATOR . $subDir;
+
+        // check directory
+        if (!is_dir($new_dir)) {
+            $this->throwException(self::ERROR_DIR_NOT_EXIST, 'current path: ' . $new_dir);
+        }
+
+        $this->pathDir = $new_dir;
+
+        return $this->pathDir;
     }
 
     /**
