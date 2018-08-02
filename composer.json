@@ -14,7 +14,7 @@
     },
     "autoload": {
         "psr-4": {
-            "cs-eliseev\\": "src"
+            "browse\\": "src"
         }
     }
 }
