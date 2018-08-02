@@ -8,6 +8,8 @@
  * Time: 0:50
  */
 
+use browse\ActionDirectory;
+
 require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'ActionDirectory.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'TestsActionDirectory.php';
 
