@@ -3,6 +3,7 @@
 namespace browse;
 
 use DirectoryIterator;
+use Exception;
 
 /**
  * Class ActionDirectory
@@ -29,11 +30,11 @@ class ActionDirectory
     protected $fullScan = false;
 
     protected $errors = [
-        self::ERROR_DIR_NOT_EXIST => 'Дирректория не найдена',
-        self::ERROR_FILE_MOD_NOT_OCT => 'Неверный формат прав'
+        self::ERROR_DIR_NOT_EXIST => 'Directory is not exist',
+        self::ERROR_FILE_MOD_NOT_OCT => 'Invalid file mode'
     ];
 
-    public function __construct($pathDir = '')
+    public function __construct(string $pathDir = '')
     {
         $this->pathDir = $pathDir;
     }
@@ -41,12 +42,38 @@ class ActionDirectory
     /**
      * Show directory
      *
+     * @return array
+     */
+    public function showDir(): array
+    {
+        return $this->viewDir();
+    }
+
+    /**
+     * Show directory & sub directory
+     *
+     * @return array
+     */
+    public function scanDir(): array
+    {
+        // enabled full scan
+        $this->fullScan = true;
+
+        $res = $this->viewDir();
+
+        // disabled full scan
+        $this->fullScan = false;
+
+        return $res;
+    }
+
+    /**
+     * Recursive function view directory
+     *
      * @param string $defaultPath
      * @return array
-     * @throws Exception
-     * @throws SystemException
      */
-    public function showDir($defaultPath = '')
+    protected function viewDir(string $defaultPath = ''): array
     {
         // check directory
         if (!is_dir($this->pathDir)) {
@@ -61,6 +88,8 @@ class ActionDirectory
         // get relative path for start directory
         $path = str_replace($defaultPath, '', $iterator->getPath());
         $path = $path ? $path . DIRECTORY_SEPARATOR : '';
+
+        $res = [];
 
         while ($iterator->valid()) {
 
@@ -85,7 +114,7 @@ class ActionDirectory
                     if ($this->fullScan) {
 
                         $this->pathDir = $item->getPathname();
-                        $attr['node'] = $this->scanDir($defaultPath);
+                        $attr['node'] = $this->viewDir($defaultPath);
                     }
 
                 } elseif($item->isFile()) {
@@ -101,7 +130,7 @@ class ActionDirectory
                     if ($this->fullScan && $this->showLink) {
 
                         $this->pathDir = $item->getPathname();
-                        $attr['node'] = $this->scanDir($defaultPath);
+                        $attr['node'] = $this->viewDir($defaultPath);
                     }
                 }
 
@@ -124,35 +153,13 @@ class ActionDirectory
     }
 
     /**
-     * Show directory & sub directory
-     *
-     * @param string $defaultPath
-     * @return array
-     * @throws Exception
-     * @throws SystemException
-     */
-    public function scanDir($defaultPath = '')
-    {
-        // enabled full scan
-        $this->fullScan = true;
-
-        $res = $this->showDir($defaultPath);
-
-        // disabled full scan
-        $this->fullScan = false;
-
-        return $res;
-    }
-
-    /**
      * Create new directory to path
      *
-     * @param $newDir
+     * @param string $newDir
      * @param string $fileMod
      * @return bool
-     * @throws Exception
      */
-        public function createDir($newDir, $fileMod = '0755')
+    public function createDir(string $newDir, string $fileMod = '0755'): bool
     {
         // check directory
         if (!is_dir($this->pathDir)) {
@@ -212,8 +219,6 @@ class ActionDirectory
 
     /**
      * Delete files to directory
-     *
-     * @throws Exception
      */
     public function deleteFilesToDir(): void
     {
@@ -258,8 +263,6 @@ class ActionDirectory
 
     /**
      * Delete files to directory and sub directory
-     *
-     * @throws Exception
      */
     public function deleteFilesDirAndSubDir(): void
     {
@@ -275,10 +278,9 @@ class ActionDirectory
     /**
      * Copy files to directory
      *
-     * @param $dir
-     * @throws Exception
+     * @param string $dir
      */
-    public function copyFilesToDir($dir): void
+    public function copyFilesToDir(string $dir): void
     {
         // check directory
         if (!is_dir($this->pathDir)) {
@@ -357,10 +359,9 @@ class ActionDirectory
     /**
      * Copy files directory & sub directory
      *
-     * @param $dir
-     * @throws Exception
+     * @param string $dir
      */
-    public function copyStructureDir($dir): void
+    public function copyStructureDir(string $dir): void
     {
         // enabled full scan
         $this->fullScan = true;
@@ -373,8 +374,6 @@ class ActionDirectory
 
     /**
      * Delete directory
-     *
-     * @throws Exception
      */
     public function deleteDir(): void
     {
@@ -390,10 +389,9 @@ class ActionDirectory
     /**
      * Delete directory by name
      *
-     * @param $name
-     * @throws Exception
+     * @param string $name
      */
-    public function deleteDirByName($name): void
+    public function deleteDirByName(string $name): void
     {
         $path = $this->pathDir;
         $this->pathDir = $this->pathDir . DIRECTORY_SEPARATOR . $name;
@@ -406,11 +404,10 @@ class ActionDirectory
     /**
      * Move directory new path
      *
-     * @param $newPath
-     * @return bool|string
-     * @throws Exception
+     * @param string $newPath
+     * @return string
      */
-    public function moveDir($newPath)
+    public function moveDir(string $newPath): string
     {
         // check directory
         if (!is_dir($this->pathDir)) {
@@ -433,11 +430,10 @@ class ActionDirectory
     /**
      * Move directory new path by name
      *
-     * @param $name
-     * @param $newPath
-     * @throws Exception
+     * @param string $name
+     * @param string $newPath
      */
-    public function moveDirByName($name, $newPath)
+    public function moveDirByName(string $name, string $newPath): void
     {
         $path = $this->pathDir;
         $this->pathDir = $this->pathDir . DIRECTORY_SEPARATOR . $name;
@@ -450,11 +446,10 @@ class ActionDirectory
     /**
      * Rename directory
      *
-     * @param $newName
-     * @return bool|string
-     * @throws Exception
+     * @param string $newName
+     * @return string
      */
-    public function renameDir($newName)
+    public function renameDir(string $newName): string
     {
         $list_path = explode(DIRECTORY_SEPARATOR, $this->pathDir);
 
@@ -474,11 +469,10 @@ class ActionDirectory
     /**
      * Rename directory by name
      *
-     * @param $oldName
-     * @param $newName
-     * @throws Exception
+     * @param string $oldName
+     * @param string $newName
      */
-    public function renameDirByName($oldName, $newName): void
+    public function renameDirByName(string $oldName, string $newName): void
     {
         // check directory
         if (!is_dir($this->pathDir . DIRECTORY_SEPARATOR . $oldName)) {
@@ -509,7 +503,7 @@ class ActionDirectory
      *
      * @param bool $fileMode
      */
-    public function setFileMode(bool $fileMode)
+    public function setFileMode(bool $fileMode): void
     {
         $this->fileMode = $fileMode;
     }
@@ -517,10 +511,9 @@ class ActionDirectory
     /**
      * Set current path directory
      *
-     * @param $pathDir
-     * @throws Exception
+     * @param string $pathDir
      */
-    public function setPathDir($pathDir)
+    public function setPathDir(string $pathDir): void
     {
         // check directory
         if (!is_dir($pathDir)) {
@@ -533,9 +526,9 @@ class ActionDirectory
     /**
      * Get current path directory
      *
-     * @return bool|string
+     * @return string
      */
-    public function getPathDir()
+    public function getPathDir(): string
     {
         return $this->pathDir;
     }
@@ -544,10 +537,9 @@ class ActionDirectory
      * Get current name directory
      *
      * @param string $pathDir
-     * @return mixed
-     * @throws Exception
+     * @return string
      */
-    public function getCurrentDirName($pathDir = '')
+    public function getCurrentDirName(string $pathDir = ''): string
     {
         if (empty($pathDir)) {
 
@@ -573,9 +565,8 @@ class ActionDirectory
      *
      * @param string $pathDir
      * @return string
-     * @throws Exception
      */
-    public function getParentDir($pathDir = '')
+    public function getParentDir(string $pathDir = ''): string
     {
         if (empty($pathDir)) {
 
@@ -601,7 +592,7 @@ class ActionDirectory
      *
      * @return string
      */
-    public function gotoParentDir()
+    public function gotoParentDir(): string
     {
         $this->pathDir = $this->getParentDir();
 
@@ -611,10 +602,10 @@ class ActionDirectory
     /**
      * Go to sub directory
      *
-     * @param $subDir
+     * @param string $subDir
      * @return string
      */
-    public function gotoSubDir($subDir)
+    public function gotoSubDir(string $subDir): string
     {
         $new_dir = $this->pathDir . DIRECTORY_SEPARATOR . $subDir;
 
@@ -632,21 +623,21 @@ class ActionDirectory
      * Check oct (0777)
      *
      * @param $oct
-     * @return false|int
+     * @return bool
      */
-    protected function isOct($oct)
+    protected function isOct($oct): bool
     {
-        return preg_match("/^[0-7]{4}$/", $oct);
+        return (bool)preg_match("/^[0-7]{4}$/", $oct);
     }
 
     /**
      * Exceptions
      *
-     * @param $code
+     * @param int $code
      * @param string $msg
      * @throws Exception
      */
-    protected function throwException($code, $msg = '')
+    protected function throwException(int $code, string $msg = ''): void
     {
         throw new Exception(
             $this->errors[$code] . ($msg ? ' ' . $msg : ''),
