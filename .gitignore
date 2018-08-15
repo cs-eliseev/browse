@@ -1,2 +1,4 @@
 .idea
-/vendor/
+vendor
+index.php
+composer.lock

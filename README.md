@@ -3,6 +3,15 @@ Browse PHP
 
 This library contains pure PHP implementations for directory managing.
 
+
+# Install
+
+
+### Composer
+
+Execute the following command to get the latest version of the package:
+>composer require cs-eliseev/browse
+
 ### Usage
 
 Usage all method exec relative set path directory.
